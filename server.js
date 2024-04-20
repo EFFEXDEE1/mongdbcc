@@ -86,18 +86,9 @@ app.put("/profs/:id", function (req, res) {
 });
 
 app.delete("/profs/:id", async function (req, res) {
-    try{
-        const id = req.params.id
+       const data = req.body
 
-        const result = await collection.deleteOne(id)
-
-        res.status(200).json(result);
-    } catch (err) {
-        console.error('Fehler:', err);
-        res.status(500).json({ error: 'Ein Fehler ist aufgetreten' });
-    }
-    
-       
+       const result = await collection.deleteOne(data)
 
 });
 
