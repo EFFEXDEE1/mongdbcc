@@ -85,34 +85,39 @@ app.put("/profs/:id", function (req, res) {
     });
 });
 
-app.delete("/profs/:id", function (req, res) {
-    fs.readFile(filename, "utf8", function (err, data) {
-        let dataAsObject = JSON.parse(data);
-        dataAsObject.splice(req.params.id, 1);
-        fs.writeFile(filename, JSON.stringify(dataAsObject), () => {
-            res.writeHead(200, {
-                "Content-Type": "application/json",
-            });
-            res.end(JSON.stringify(dataAsObject));
-        });
-    });
+app.delete("/profs/:id", async function (req, res) {
+    try{
+        const id = req.params.id
+
+        const result = await collection.deleteOne(id)
+
+        res.status(200).json(result);
+    } catch (err) {
+        console.error('Fehler:', err);
+        res.status(500).json({ error: 'Ein Fehler ist aufgetreten' });
+    }
+    
+       
+
 });
 
-app.post("/profs", function (req, res) {
-    fs.readFile(filename, "utf8", function (err, data) {
-        let dataAsObject = JSON.parse(data);
-        dataAsObject.push({
-            id: dataAsObject.length,
-            name: req.body.name,
-            rating: req.body.rating,
-        });
-        fs.writeFile(filename, JSON.stringify(dataAsObject), () => {
-            res.writeHead(200, {
-                "Content-Type": "application/json",
-            });
-            res.end(JSON.stringify(dataAsObject));
-        });
-    });
+app.post("/profs", async function (req, res) {
+
+    try {
+    const data = req.body
+    if (!data || Object.keys(data).length === 0) {
+        return res.status(400).json({ error: 'Ungültige Anfrage: Body ist leer' });
+    }
+    
+    const result = await collection.insertOne(data)
+
+    res.status(200).json(result);
+    } catch (err) {
+        console.error('Fehler:', err);
+        res.status(500).json({ error: 'Ein Fehler ist aufgetreten' });
+    }
+
 });
+
 
 app.listen(port, () => console.log(`Server listening on port ${port}!`));
